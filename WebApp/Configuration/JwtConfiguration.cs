@@ -2,6 +2,6 @@
 
 public class JwtConfiguration
 {
-    public string Issuer { get; set; }
-    public string Secret { get; set; }
+    public string Issuer { get; set; } = string.Empty;
+    public string Secret { get; set; } = string.Empty;
 }

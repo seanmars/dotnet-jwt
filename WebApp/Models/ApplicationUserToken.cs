@@ -4,5 +4,5 @@ namespace WebApp.Models;
 
 public class ApplicationUserToken : IdentityUserToken<int>
 {
-    public virtual ApplicationUser User { get; set; }
+    public virtual ApplicationUser? User { get; set; }
 }

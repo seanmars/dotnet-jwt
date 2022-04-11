@@ -4,5 +4,5 @@ namespace WebApp.Models;
 
 public class ApplicationRoleClaim : IdentityRoleClaim<int>
 {
-    public virtual ApplicationRole Role { get; set; }
+    public virtual ApplicationRole? Role { get; set; }
 }
