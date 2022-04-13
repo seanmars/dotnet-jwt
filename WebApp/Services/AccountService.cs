@@ -1,7 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Immutable;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using WebApp.Claims;
+using WebApp.Data;
 using WebApp.Models;
+using WebApp.Models.ViewModels;
 
 namespace WebApp.Services;
 
@@ -26,10 +30,10 @@ public class AccountService
         var user = new ApplicationUser
         {
             Email = email,
-            NormalizedEmail = email.ToUpper(),
+            NormalizedEmail = _userManager.NormalizeEmail(email),
             EmailConfirmed = emailConfirmed,
             UserName = userName,
-            NormalizedUserName = userName.ToUpper()
+            NormalizedUserName = _userManager.NormalizeName(userName)
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -44,6 +48,23 @@ public class AccountService
         }
 
         return result;
+    }
+
+    public async Task<IdentityResult?> AddUserToRole(string userId, string roleName)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return null;
+        }
+
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role == null)
+        {
+            return null;
+        }
+
+        return await _userManager.AddToRoleAsync(user, roleName);
     }
 
     public async Task<IdentityResult> ValidUser(string userName, string password)
@@ -86,7 +107,7 @@ public class AccountService
         var role = new ApplicationRole
         {
             Name = roleName,
-            NormalizedName = roleName.ToUpper()
+            NormalizedName = _roleManager.NormalizeKey(roleName)
         };
 
         var result = await _roleManager.CreateAsync(role);
@@ -105,5 +126,37 @@ public class AccountService
         }
 
         return result;
+    }
+
+    public async Task<IList<RoleViewModel>> GetAllRole(bool includeSuperAdmin = false)
+    {
+        var roles = await _roleManager.Roles
+            .Where(x => includeSuperAdmin || x.Name != ConstantData.DefaultRole.SuperAdminRole)
+            .ToListAsync();
+
+        if (!roles.Any())
+        {
+            return ImmutableArray<RoleViewModel>.Empty;
+        }
+
+        var viewModels = roles
+            .Select(role => new RoleViewModel()
+            {
+                Id = role.Id,
+                Name = role.Name,
+            })
+            .ToList();
+
+        return viewModels;
+    }
+
+    public async Task<ApplicationRole?> FindRoleById(int roleId, CancellationToken stoppingToken = default)
+    {
+        var role = await _roleManager.Roles
+            .Where(r => r.Id == roleId)
+            .Include(r => r.UserRoles)
+            .FirstOrDefaultAsync(stoppingToken);
+
+        return role;
     }
 }
