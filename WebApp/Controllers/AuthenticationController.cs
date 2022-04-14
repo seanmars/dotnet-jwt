@@ -76,4 +76,12 @@ public class AuthenticationController : ControllerBase
             return BadRequest();
         }
     }
+
+    [Route("/api/claims")]
+    [HttpGet]
+    public IActionResult GetClaims()
+    {
+        var claims = User.Claims.Select(p => new { p.Type, p.Value });
+        return Ok(claims);
+    }
 }

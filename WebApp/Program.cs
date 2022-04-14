@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using WebApp.Configuration;
 using WebApp.Data;
 using WebApp.Models;
 using WebApp.Services;
@@ -19,6 +21,9 @@ WebApplication CreateApplication()
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
 
+    services.Configure<JwtOption>(builder.Configuration.GetSection("Jwt"));
+    services.AddOptions<JwtOption>();
+
     services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlite(
             configuration.GetConnectionString("DefaultConnection")));
@@ -35,8 +40,9 @@ WebApplication CreateApplication()
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
-    services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    services.AddCors();
+
+    services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
             options.IncludeErrorDetails = true;
@@ -53,7 +59,22 @@ WebApplication CreateApplication()
             };
         });
 
-    services.AddAuthorization();
+    services.ConfigureApplicationCookie(options =>
+    {
+        options.AccessDeniedPath = "/access-denied";
+        options.Cookie.Name = "backend-app";
+        options.Cookie.HttpOnly = true;
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+        options.SlidingExpiration = true;
+    });
+
+    services.AddAuthorization(options =>
+    {
+        options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    });
 
     services.AddSingleton<JwtService>();
     services.AddScoped<AccountService>();
@@ -72,6 +93,13 @@ WebApplication CreateApplication()
     }
 
     app.UseHttpsRedirection();
+
+    app.UseCors(corsPolicyBuilder =>
+    {
+        corsPolicyBuilder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
 
     app.UseAuthentication();
     app.UseAuthorization();

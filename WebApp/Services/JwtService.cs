@@ -1,7 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using WebApp.Configuration;
 
 namespace WebApp.Services;
 
@@ -11,12 +13,12 @@ public class JwtService
     public const string JwtSecretKey = "Jwt:Secret";
 
     private readonly ILogger<JwtService> _logger;
-    private readonly IConfiguration _configuration;
+    private readonly JwtOption _jwtOption;
 
-    public JwtService(ILogger<JwtService> logger, IConfiguration configuration)
+    public JwtService(ILogger<JwtService> logger, IOptions<JwtOption> options)
     {
         _logger = logger;
-        _configuration = configuration;
+        _jwtOption = options.Value;
     }
 
     public static byte[] GetKeyBytes(string secretKey)
@@ -26,8 +28,8 @@ public class JwtService
 
     public string GenerateToken(string userName, int expireMinutes = 30)
     {
-        var jwtIssuer = _configuration[JwtIssueKey];
-        var jwtSecret = _configuration[JwtSecretKey];
+        var jwtIssuer = _jwtOption.Issuer;
+        var jwtSecret = _jwtOption.Secret;
 
         var symmetricKey = GetKeyBytes(jwtSecret);
         var now = DateTime.UtcNow;
@@ -46,8 +48,7 @@ public class JwtService
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-        var token = tokenHandler.WriteToken(securityToken);
 
-        return token;
+        return tokenHandler.WriteToken(securityToken);
     }
 }
