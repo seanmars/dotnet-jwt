@@ -34,14 +34,18 @@ public class JwtService
         var symmetricKey = GetKeyBytes(jwtSecret);
         var now = DateTime.UtcNow;
 
+        var userClaimsIdentity = new ClaimsIdentity(new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Iss, jwtIssuer),
+            new Claim(JwtRegisteredClaimNames.Sub, userName),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        });
+
+        // TODO: add roles to claims
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Iss, jwtIssuer),
-                new Claim(JwtRegisteredClaimNames.Sub, userName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            }),
+            Subject = userClaimsIdentity,
             Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(symmetricKey), SecurityAlgorithms.HmacSha256Signature)
         };
