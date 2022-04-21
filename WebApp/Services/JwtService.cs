@@ -26,13 +26,10 @@ public class JwtService
         return Encoding.UTF8.GetBytes(secretKey);
     }
 
-    public string GenerateToken(string userName, int expireMinutes = 30)
+    public string GenerateToken(string userName, int expireMinutes = 30, IList<Claim>? claims = null)
     {
         var jwtIssuer = _jwtOption.Issuer;
         var jwtSecret = _jwtOption.Secret;
-
-        var symmetricKey = GetKeyBytes(jwtSecret);
-        var now = DateTime.UtcNow;
 
         var userClaimsIdentity = new ClaimsIdentity(new[]
         {
@@ -41,13 +38,20 @@ public class JwtService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         });
 
-        // TODO: add roles to claims
+        if (claims != null)
+        {
+            userClaimsIdentity.AddClaims(claims);
+        }
 
+        var now = DateTime.UtcNow;
+        var symmetricKey = GetKeyBytes(jwtSecret);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = userClaimsIdentity,
+            IssuedAt = now,
             Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(symmetricKey), SecurityAlgorithms.HmacSha256Signature)
+            Subject = userClaimsIdentity,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(symmetricKey), SecurityAlgorithms.HmacSha256Signature)
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();

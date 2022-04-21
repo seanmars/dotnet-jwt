@@ -1,4 +1,4 @@
-﻿namespace WebApp.Identity;
+﻿namespace WebApp.Constants;
 
 public struct PermissionInfo
 {
@@ -6,7 +6,7 @@ public struct PermissionInfo
     public string Description { get; set; }
 }
 
-public static class RolePermission
+public static class RolePermissionClaim
 {
     public const string ClaimName = "permission";
 
@@ -18,12 +18,12 @@ public static class RolePermission
 
     public static readonly List<PermissionInfo> AllPermission = new()
     {
-        new PermissionInfo()
+        new PermissionInfo
         {
             Name = ClaimValue.RoleClaim,
             Description = "Access to the role claim page"
         },
-        new PermissionInfo()
+        new PermissionInfo
         {
             Name = ClaimValue.GameData,
             Description = "Access to the game data page"

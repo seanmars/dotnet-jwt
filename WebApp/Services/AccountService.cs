@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Claims;
+using WebApp.Constants;
 using WebApp.Data;
 using WebApp.Models;
 using WebApp.Models.ViewModels;
