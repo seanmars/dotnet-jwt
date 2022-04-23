@@ -26,7 +26,7 @@ public class JwtService
         return Encoding.UTF8.GetBytes(secretKey);
     }
 
-    public string GenerateToken(string userName, int expireMinutes = 30, IList<Claim>? claims = null)
+    public string GenerateToken(string userName, IList<Claim>? claims = null, int expireMinutes = 30)
     {
         var jwtIssuer = _jwtOption.Issuer;
         var jwtSecret = _jwtOption.Secret;

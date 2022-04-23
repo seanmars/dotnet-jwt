@@ -7,7 +7,7 @@ namespace WebApp.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-[Authorize]
+// [Authorize]
 public class AuthenticationController : ControllerBase
 {
     private readonly ILogger<AuthenticationController> _logger;
@@ -22,10 +22,10 @@ public class AuthenticationController : ControllerBase
     [NonAction]
     private async Task<bool> ValidateUser(SignInViewRecord signInViewRecord)
     {
-        var result = await _accountService.ValidUser(signInViewRecord.Username, signInViewRecord.Password);
+        var result = await _accountService.SignIn(signInViewRecord.Username, signInViewRecord.Password);
         if (!result.Succeeded)
         {
-            _logger.LogWarning("Validate User failed: {@Errors}", result.Errors);
+            _logger.LogInformation("SignIn failed: {@Errors}", result.Errors);
         }
 
         return result.Succeeded;
@@ -79,6 +79,7 @@ public class AuthenticationController : ControllerBase
 
     [Route("/api/claims")]
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public IActionResult GetClaims()
     {
         var claims = User.Claims.Select(p => new { p.Type, p.Value });

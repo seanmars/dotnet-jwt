@@ -14,14 +14,17 @@ public class AccountService
     private readonly ILogger<AccountService> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly JwtService _jwtService;
 
     public AccountService(ILogger<AccountService> logger,
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager,
+        JwtService jwtService)
     {
         _logger = logger;
         _userManager = userManager;
         _roleManager = roleManager;
+        _jwtService = jwtService;
     }
 
     public async Task<IdentityResult> CreateUser(string email, string userName, string password,
@@ -67,15 +70,15 @@ public class AccountService
         return await _userManager.AddToRoleAsync(user, roleName);
     }
 
-    public async Task<IdentityResult> ValidUser(string userName, string password)
+    public async Task<IdentityResult> SignIn(string userName, string password)
     {
         var user = await _userManager.FindByNameAsync(userName);
         if (user == null)
         {
             return IdentityResult.Failed(new IdentityError
             {
-                Code = "UserNotFound",
-                Description = "User not found"
+                Code = "UserNotExisted",
+                Description = "User not existed"
             });
         }
 
@@ -84,10 +87,12 @@ public class AccountService
         {
             return IdentityResult.Failed(new IdentityError
             {
-                Code = "InvalidPassword",
-                Description = "Invalid password"
+                Code = "PasswordInvalid",
+                Description = "Password invalid"
             });
         }
+
+        _jwtService.GenerateToken(user.NormalizedUserName);
 
         return IdentityResult.Success;
     }

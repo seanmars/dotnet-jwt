@@ -1,47 +1,38 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.Configuration;
 using WebApp.Data;
+using WebApp.Extensions;
 using WebApp.Models;
 using WebApp.Services;
 
-WebApplication CreateApplication()
+void SettingService(IConfiguration configuration, IServiceCollection services)
 {
-    var builder = WebApplication.CreateBuilder(args);
-    var configuration = builder.Configuration;
-    var services = builder.Services;
-
-    #region Setting Services
-
     services.AddCors();
     services.AddControllers();
+
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
 
-    services.Configure<JwtOption>(builder.Configuration.GetSection("Jwt"));
-    services.AddOptions<JwtOption>();
+    services.Configure<JwtOption>(configuration.GetSection("Jwt"));
 
     services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlite(
             configuration.GetConnectionString("DefaultConnection")));
 
-    services.AddIdentity<ApplicationUser, ApplicationRole>(
-            options =>
-            {
-                options.SignIn.RequireConfirmedAccount = true;
-                options.User.RequireUniqueEmail = true;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-            })
-        .AddRoles<ApplicationRole>()
+    services.AddBaseIdentity<ApplicationUser, ApplicationRole>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+            options.User.RequireUniqueEmail = true;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+        })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
-
-    services.AddCors();
 
     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
@@ -49,8 +40,6 @@ WebApplication CreateApplication()
             options.IncludeErrorDetails = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
-                RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
                 ValidateIssuer = true,
                 ValidIssuer = configuration[JwtService.JwtIssueKey],
                 ValidateAudience = false,
@@ -60,32 +49,21 @@ WebApplication CreateApplication()
             };
         });
 
-    services.ConfigureApplicationCookie(options =>
-    {
-        options.AccessDeniedPath = "/access-denied";
-        options.Cookie.Name = "backend-app";
-        options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromDays(30);
-        options.LoginPath = "/login";
-        options.LogoutPath = "/logout";
-        options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
-        options.SlidingExpiration = true;
-    });
-
     services.AddAuthorization(options =>
     {
-        options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+        // Setting the default authorization policy for JwtBearer
+        options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+            .RequireAuthenticatedUser()
+            .Build();
     });
 
     services.AddSingleton<JwtService>();
+    services.AddScoped<SignInManager>();
     services.AddScoped<AccountService>();
+}
 
-    #endregion
-
-    #region Settings Application
-
-    var app = builder.Build();
-    // Configure the HTTP request pipeline.
+void ConfigureApplication(WebApplication app)
+{
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
@@ -106,8 +84,18 @@ WebApplication CreateApplication()
     app.UseAuthorization();
 
     app.MapControllers();
+}
 
-    #endregion
+WebApplication CreateApplication()
+{
+    var builder = WebApplication.CreateBuilder(args);
+    var configuration = builder.Configuration;
+    var services = builder.Services;
+
+    SettingService(configuration, services);
+
+    var app = builder.Build();
+    ConfigureApplication(app);
 
     return app;
 }
