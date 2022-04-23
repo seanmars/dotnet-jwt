@@ -40,6 +40,8 @@ public class SignInManager
             return (IdentityResult.Failed(new IdentityError { Description = "Password is incorrect" }), null);
         }
 
+        // TODO: using claims factory to create principal and add jwt token
+
         var token = Jwt.GenerateToken(user.NormalizedUserName);
 
         return (IdentityResult.Success, token);
