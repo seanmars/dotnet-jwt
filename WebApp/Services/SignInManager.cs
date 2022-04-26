@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using WebApp.Data;
 using WebApp.Models;
 
 namespace WebApp.Services;
@@ -8,42 +10,40 @@ public class SignInManager
     private readonly ILogger<SignInManager> _logger;
 
     public UserManager<ApplicationUser> UserManager { get; set; }
-    public IUserClaimsPrincipalFactory<ApplicationUser> ClaimsFactory { get; set; }
     public RoleManager<ApplicationRole> RoleManager { get; set; }
-    public JwtService Jwt { get; set; }
+    public AccountService AccountService { get; set; }
+    public JwtService JwtService { get; set; }
 
     public SignInManager(ILogger<SignInManager> logger,
         UserManager<ApplicationUser> userManager,
-        IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory,
         RoleManager<ApplicationRole> roleManager,
-        JwtService jwt
+        AccountService accountService,
+        JwtService jwtService
     )
     {
         _logger = logger;
         UserManager = userManager;
         RoleManager = roleManager;
-        Jwt = jwt;
-        ClaimsFactory = claimsFactory;
+        AccountService = accountService;
+        JwtService = jwtService;
     }
 
     public async Task<(IdentityResult Result, string? Token)> SignInAsync(string userName, string password)
     {
-        var user = await UserManager.FindByNameAsync(userName);
-        if (user == null)
+        var result = await AccountService.ValidUserAsync(userName, password);
+        if (!result.Succeeded)
         {
-            return (IdentityResult.Failed(new IdentityError { Description = "User not found" }), null);
+            return (result, null);
         }
 
-        var result = await UserManager.CheckPasswordAsync(user, password);
-        if (!result)
+        // TODO: get all role permissions
+        var claims = new List<Claim>
         {
-            return (IdentityResult.Failed(new IdentityError { Description = "Password is incorrect" }), null);
-        }
+            new(ClaimTypes.Role, ConstantData.DefaultRole.Member),
+            new(ClaimTypes.Role, "admin"),
+        };
+        var token = JwtService.GenerateToken(userName, claims);
 
-        // TODO: using claims factory to create principal and add jwt token
-
-        var token = Jwt.GenerateToken(user.NormalizedUserName);
-
-        return (IdentityResult.Success, token);
+        return (result, token);
     }
 }

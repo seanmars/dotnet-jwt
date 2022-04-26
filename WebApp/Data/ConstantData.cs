@@ -13,13 +13,15 @@ public static class ConstantData
 
     public static class DefaultRole
     {
-        public const string SuperAdminRole = "SuperAdmin";
-        public const string AdminRole = "Admin";
+        public static readonly string SuperAdminRole = "SuperAdmin".ToLower();
+        public static readonly string AdminRole = "Admin".ToLower();
+        public static readonly string Member = "Member".ToLower();
 
         public static readonly List<string> Roles = new(2)
         {
             SuperAdminRole,
-            AdminRole
+            AdminRole,
+            Member
         };
     }
 

@@ -14,19 +14,17 @@ public static class IdentityServiceCollectionExtensions
         // Hosting doesn't add IHttpContextAccessor by default
         services.AddHttpContextAccessor();
         // Identity services
-        services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
-        services.TryAddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
-        services.TryAddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
-        services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
-        services.TryAddScoped<IRoleValidator<TRole>, RoleValidator<TRole>>();
+        services.AddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
+        services.AddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
+        services.AddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
+        services.AddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+        services.AddScoped<IRoleValidator<TRole>, RoleValidator<TRole>>();
         // No interface for the error describer so we can add errors without rev'ing the interface
-        services.TryAddScoped<IdentityErrorDescriber>();
-        services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<TUser>>();
-        services.TryAddScoped<ITwoFactorSecurityStampValidator, TwoFactorSecurityStampValidator<TUser>>();
-        services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
-        services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
-        services.TryAddScoped<UserManager<TUser>>();
-        services.TryAddScoped<RoleManager<TRole>>();
+        services.AddScoped<IdentityErrorDescriber>();
+        services.AddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
+        services.AddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
+        services.AddScoped<UserManager<TUser>>();
+        services.AddScoped<RoleManager<TRole>>();
 
         if (setupAction != null)
         {

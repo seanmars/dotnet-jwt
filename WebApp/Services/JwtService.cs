@@ -9,9 +9,6 @@ namespace WebApp.Services;
 
 public class JwtService
 {
-    public const string JwtIssueKey = "Jwt:Issuer";
-    public const string JwtSecretKey = "Jwt:Secret";
-
     private readonly ILogger<JwtService> _logger;
     private readonly JwtOption _jwtOption;
 
@@ -26,7 +23,7 @@ public class JwtService
         return Encoding.UTF8.GetBytes(secretKey);
     }
 
-    public string GenerateToken(string userName, IList<Claim>? claims = null, int expireMinutes = 30)
+    public string GenerateToken(string userName, IList<Claim>? claims = null, int expireHours = 720)
     {
         var jwtIssuer = _jwtOption.Issuer;
         var jwtSecret = _jwtOption.Secret;
@@ -48,7 +45,7 @@ public class JwtService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             IssuedAt = now,
-            Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
+            Expires = now.AddHours(expireHours),
             Subject = userClaimsIdentity,
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(symmetricKey), SecurityAlgorithms.HmacSha256Signature)

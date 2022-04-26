@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApp.Authorizations;
 using WebApp.Records;
 using WebApp.Services;
 
@@ -11,24 +12,13 @@ namespace WebApp.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly ILogger<AuthenticationController> _logger;
-    private readonly AccountService _accountService;
+    private readonly SignInManager _signInManager;
 
-    public AuthenticationController(ILogger<AuthenticationController> logger, AccountService accountService)
+    public AuthenticationController(ILogger<AuthenticationController> logger,
+        SignInManager signInManager)
     {
         _logger = logger;
-        _accountService = accountService;
-    }
-
-    [NonAction]
-    private async Task<bool> ValidateUser(SignInViewRecord signInViewRecord)
-    {
-        var result = await _accountService.SignIn(signInViewRecord.Username, signInViewRecord.Password);
-        if (!result.Succeeded)
-        {
-            _logger.LogInformation("SignIn failed: {@Errors}", result.Errors);
-        }
-
-        return result.Succeeded;
+        _signInManager = signInManager;
     }
 
     [NonAction]
@@ -40,7 +30,8 @@ public class AuthenticationController : ControllerBase
             return false;
         }
 
-        var result = await _accountService.CreateUser(signUpViewRecord.Email, signUpViewRecord.Username, signUpViewRecord.Password);
+        var result = await _signInManager.AccountService.CreateUser(
+            signUpViewRecord.Email, signUpViewRecord.Username, signUpViewRecord.Password);
         if (!result.Succeeded)
         {
             _logger.LogWarning("Create User failed: {@Errors}", result.Errors);
@@ -53,36 +44,43 @@ public class AuthenticationController : ControllerBase
     [HttpPost("signin")]
     public async Task<IActionResult> SignIn([FromBody] SignInViewRecord signInViewRecord)
     {
-        if (await ValidateUser(signInViewRecord))
+        var (result, token) = await _signInManager.SignInAsync(signInViewRecord.Username, signInViewRecord.Password);
+        if (!result.Succeeded)
         {
-            return Ok();
-        }
-        else
-        {
+            _logger.LogDebug("SignIn failed: {@Errors}", result.Errors);
             return BadRequest();
         }
+
+        return Ok(new { token });
     }
+
 
     [AllowAnonymous]
     [HttpPost("signup")]
     public async Task<IActionResult> SignUp([FromBody] SignUpViewRecord signUpViewRecord)
     {
-        if (await CreateUser(signUpViewRecord))
-        {
-            return Ok();
-        }
-        else
+        if (!await CreateUser(signUpViewRecord))
         {
             return BadRequest();
         }
+
+        return Ok();
     }
 
     [Route("/api/claims")]
     [HttpGet]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public IActionResult GetClaims()
     {
         var claims = User.Claims.Select(p => new { p.Type, p.Value });
         return Ok(claims);
+    }
+
+    [Route("/api/test")]
+    [HttpGet]
+    [Authorize, RolePermissionFilter]
+    public IActionResult Test()
+    {
+        return Ok();
     }
 }

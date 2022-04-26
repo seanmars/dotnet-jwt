@@ -14,17 +14,14 @@ public class AccountService
     private readonly ILogger<AccountService> _logger;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
-    private readonly JwtService _jwtService;
 
     public AccountService(ILogger<AccountService> logger,
         UserManager<ApplicationUser> userManager,
-        RoleManager<ApplicationRole> roleManager,
-        JwtService jwtService)
+        RoleManager<ApplicationRole> roleManager)
     {
         _logger = logger;
         _userManager = userManager;
         _roleManager = roleManager;
-        _jwtService = jwtService;
     }
 
     public async Task<IdentityResult> CreateUser(string email, string userName, string password,
@@ -53,6 +50,23 @@ public class AccountService
         return result;
     }
 
+    public async Task<IdentityResult> ValidUserAsync(string userName, string password)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+        }
+
+        var result = await _userManager.CheckPasswordAsync(user, password);
+        if (!result)
+        {
+            return IdentityResult.Failed(new IdentityError { Description = "Password is incorrect" });
+        }
+
+        return IdentityResult.Success;
+    }
+
     public async Task<IdentityResult?> AddUserToRole(string userId, string roleName)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -68,33 +82,6 @@ public class AccountService
         }
 
         return await _userManager.AddToRoleAsync(user, roleName);
-    }
-
-    public async Task<IdentityResult> SignIn(string userName, string password)
-    {
-        var user = await _userManager.FindByNameAsync(userName);
-        if (user == null)
-        {
-            return IdentityResult.Failed(new IdentityError
-            {
-                Code = "UserNotExisted",
-                Description = "User not existed"
-            });
-        }
-
-        var result = await _userManager.CheckPasswordAsync(user, password);
-        if (!result)
-        {
-            return IdentityResult.Failed(new IdentityError
-            {
-                Code = "PasswordInvalid",
-                Description = "Password invalid"
-            });
-        }
-
-        _jwtService.GenerateToken(user.NormalizedUserName);
-
-        return IdentityResult.Success;
     }
 
     public async Task<IdentityResult> CreateRole(string roleName, IEnumerable<string> permissions)
