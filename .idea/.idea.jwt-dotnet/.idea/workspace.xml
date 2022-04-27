@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fd582b7b-a7fc-426e-9696-a8cf6d5096e5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/jwt.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/Controllers/AuthenticationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Controllers/AuthenticationController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Properties/launchSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/Services/AccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Services/AccountService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/Services/JwtService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Helpers/JwtHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/Services/SignInManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Services/SignInManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,6 +21,18 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/4ea681aa1df24442c1a5e1e18582b1a2d29ac5bfd41390c94a5d2cc958b5ff/UserManager.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/5d938e1a52458be6d778788b5454cca6af63f3848625822d2877455acbcc3b/ClaimsPrincipal.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/7d6a1cf03e9fb15769ae3a669ffc3e13688ff5b56d724f05557dfeb4b6f31/Claim.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/c6a722db74bab6f0297d23c55273153e71c4b1179610659a75d31645acd834bb/ImmutableList.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/c6ad457575d35dcbff26c9a5e3fb1d92f1d3c55f25ef6ebf475367b5d8/List.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/c949fbd93a3bb5df9cd45efdd19ff6888a4828a0a1124adb2df0488d21ad5f/ImmutableList_1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$USER_HOME$/AppData/Local/JetBrains/Shared/vAny/SourcesCache/d82e70c4654f974cc6248aad1cee512afee4f94673ee55f686398dd368e0b9d3/Array.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="28MRacEAQCPS7euOuozoUcK7AEM" />
   <component name="ProjectViewState">
@@ -24,7 +43,10 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -54,11 +76,24 @@
       <option name="presentableId" value="Default" />
       <updated>1651024534101</updated>
       <workItem from="1651024546771" duration="14000" />
+      <workItem from="1651024955067" duration="18089000" />
+      <workItem from="1651057881283" duration="74000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
