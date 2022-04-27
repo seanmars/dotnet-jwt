@@ -8,6 +8,7 @@ using WebApp.Authorizations;
 using WebApp.Configuration;
 using WebApp.Data;
 using WebApp.Extensions;
+using WebApp.Helpers;
 using WebApp.Models;
 using WebApp.Services;
 
@@ -48,7 +49,7 @@ void SettingService(IConfiguration configuration, IServiceCollection services)
                 ValidateAudience = false,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = false,
-                IssuerSigningKey = new SymmetricSecurityKey(JwtService.GetKeyBytes(configuration[JwtOption.SecretKeyName]))
+                IssuerSigningKey = new SymmetricSecurityKey(JwtHelper.GetKeyBytes(configuration[JwtOption.SecretKeyName]))
             };
         });
 
@@ -61,7 +62,7 @@ void SettingService(IConfiguration configuration, IServiceCollection services)
     // });
 
     services.AddTransient<IAuthorizationHandler, RolePermissionAuthorizationHandler>();
-    services.AddSingleton<JwtService>();
+    services.AddSingleton<JwtHelper>();
     services.AddScoped<AccountService>();
     services.AddScoped<SignInManager>();
 }

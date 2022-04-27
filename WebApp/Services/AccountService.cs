@@ -151,4 +151,81 @@ public class AccountService
 
         return role;
     }
+
+    private async Task<List<Claim>> GetUserClaimsAsync(string userName,
+        bool includeUserClaim,
+        bool includeRoleClaim,
+        CancellationToken cancellationToken,
+        params string[] filters)
+    {
+        userName = _userManager.NormalizeName(userName);
+        var user = await _userManager.Users
+            .Include(u => u.UserRoles!)
+            .ThenInclude(ur => ur.Role)
+            .Where(u => u.NormalizedUserName == userName)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (user == null)
+        {
+            return new List<Claim>();
+        }
+
+        var claims = new List<Claim>();
+        if (includeUserClaim)
+        {
+            claims.AddRange(await _userManager.GetClaimsAsync(user));
+        }
+
+        if (includeRoleClaim)
+        {
+            var applicationRoles = user.UserRoles!
+                .Select(userRole => userRole.Role!)
+                .ToList();
+
+            foreach (var role in applicationRoles)
+            {
+                claims.AddRange(await _roleManager.GetClaimsAsync(role));
+            }
+        }
+
+        var resultClaims = (filters.Length == 0
+                ? claims
+                : claims.Where(x => filters.Contains(x.Type)))
+            .ToList();
+
+        return resultClaims;
+    }
+
+    public Task<List<Claim>> GetUserClaimsExcludeRoleClaimAsync(string userName, params string[] filters)
+    {
+        return GetUserClaimsAsync(userName, true, false, default, filters);
+    }
+
+    public Task<List<Claim>> GetUserClaimsExcludeRoleClaimAsync(string userName, CancellationToken cancellationToken,
+        params string[] filters)
+    {
+        return GetUserClaimsAsync(userName, true, false, cancellationToken, filters);
+    }
+
+    public Task<List<Claim>> GetUserClaimsIncludeRoleClaimAsync(string userName, params string[] filters)
+    {
+        return GetUserClaimsAsync(userName, true, true, default, filters);
+    }
+
+    public Task<List<Claim>> GetUserClaimsIncludeRoleClaimAsync(string userName, CancellationToken cancellationToken,
+        params string[] filters)
+    {
+        return GetUserClaimsAsync(userName, true, true, cancellationToken, filters);
+    }
+
+    public Task<List<Claim>> GetOnlyUserRoleClaimsAsync(string userName, params string[] filters)
+    {
+        return GetUserClaimsAsync(userName, false, true, default, filters);
+    }
+
+    public Task<List<Claim>> GetOnlyUserRoleClaimsAsync(string userName, CancellationToken cancellationToken,
+        params string[] filters)
+    {
+        return GetUserClaimsAsync(userName, false, true, cancellationToken, filters);
+    }
 }

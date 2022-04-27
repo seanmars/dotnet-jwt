@@ -13,12 +13,14 @@ public class AuthenticationController : ControllerBase
 {
     private readonly ILogger<AuthenticationController> _logger;
     private readonly SignInManager _signInManager;
+    private readonly AccountService _accountService;
 
     public AuthenticationController(ILogger<AuthenticationController> logger,
-        SignInManager signInManager)
+        SignInManager signInManager, AccountService accountService)
     {
         _logger = logger;
         _signInManager = signInManager;
+        _accountService = accountService;
     }
 
     [NonAction]
@@ -30,7 +32,7 @@ public class AuthenticationController : ControllerBase
             return false;
         }
 
-        var result = await _signInManager.AccountService.CreateUser(
+        var result = await _accountService.CreateUser(
             signUpViewRecord.Email, signUpViewRecord.Username, signUpViewRecord.Password);
         if (!result.Succeeded)
         {
@@ -67,13 +69,20 @@ public class AuthenticationController : ControllerBase
         return Ok();
     }
 
-    [Route("/api/claims")]
+    [Route("/api/claims/{userName}")]
     [HttpGet]
     [Authorize]
-    public IActionResult GetClaims()
+    public async Task<IActionResult> GetClaims(string userName)
     {
-        var claims = User.Claims.Select(p => new { p.Type, p.Value });
-        return Ok(claims);
+        var claims = await _accountService.GetUserClaimsIncludeRoleClaimAsync(userName);
+        var claims2 = await _accountService.GetUserClaimsExcludeRoleClaimAsync(userName);
+        var claims3 = await _accountService.GetOnlyUserRoleClaimsAsync(userName);
+        return Ok(new
+        {
+            c = claims,
+            c2 = claims2,
+            c3 = claims3
+        });
     }
 
     [Route("/api/test")]

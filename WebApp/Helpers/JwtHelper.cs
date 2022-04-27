@@ -5,14 +5,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.Configuration;
 
-namespace WebApp.Services;
+namespace WebApp.Helpers;
 
-public class JwtService
+public class JwtHelper
 {
-    private readonly ILogger<JwtService> _logger;
+    private readonly ILogger<JwtHelper> _logger;
     private readonly JwtOption _jwtOption;
 
-    public JwtService(ILogger<JwtService> logger, IOptions<JwtOption> options)
+    public JwtHelper(ILogger<JwtHelper> logger, IOptions<JwtOption> options)
     {
         _logger = logger;
         _jwtOption = options.Value;
