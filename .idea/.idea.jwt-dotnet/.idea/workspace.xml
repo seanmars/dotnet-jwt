@@ -6,12 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="fd582b7b-a7fc-426e-9696-a8cf6d5096e5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Controllers/AuthenticationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Controllers/AuthenticationController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Properties/launchSettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApp/Services/AccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Services/AccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Services/JwtService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Helpers/JwtHelper.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/WebApp/Services/SignInManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Services/SignInManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -78,6 +73,7 @@
       <workItem from="1651024546771" duration="14000" />
       <workItem from="1651024955067" duration="18089000" />
       <workItem from="1651057881283" duration="74000" />
+      <workItem from="1651111843507" duration="3451000" />
     </task>
     <servers />
   </component>

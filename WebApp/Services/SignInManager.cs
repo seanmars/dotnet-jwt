@@ -25,7 +25,7 @@ public class SignInManager
 
     public async Task<(IdentityResult Result, string? Token)> SignInAsync(string userName, string password)
     {
-        var result = await _accountService.ValidUserAsync(userName, password);
+        var (result, user) = await _accountService.ValidUserAsync(userName, password);
         if (!result.Succeeded)
         {
             return (result, null);
@@ -36,8 +36,8 @@ public class SignInManager
             new(ClaimTypes.Role, ConstantData.DefaultRole.Member),
         };
 
-        var permissionClaims = await _accountService.GetOnlyUserRoleClaimsAsync(userName,
-            RolePermissionClaim.ClaimName);
+        var permissionClaims = await _accountService.GetClaimsOnlyRoleAsync(
+            user, RolePermissionClaim.ClaimName);
 
         claims.AddRange(permissionClaims);
 

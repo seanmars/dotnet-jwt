@@ -74,9 +74,9 @@ public class AuthenticationController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetClaims(string userName)
     {
-        var claims = await _accountService.GetUserClaimsIncludeRoleClaimAsync(userName);
-        var claims2 = await _accountService.GetUserClaimsExcludeRoleClaimAsync(userName);
-        var claims3 = await _accountService.GetOnlyUserRoleClaimsAsync(userName);
+        var claims = await _accountService.GetClaimsIncludeRoleClaimAsync(userName);
+        var claims2 = await _accountService.GetClaimsExcludeRoleClaimAsync(userName);
+        var claims3 = await _accountService.GetClaimsOnlyRoleAsync(userName);
         return Ok(new
         {
             c = claims,
