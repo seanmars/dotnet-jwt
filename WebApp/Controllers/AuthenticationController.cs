@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using WebApp.Authorizations;
+using WebApp.Extensions;
 using WebApp.Records;
 using WebApp.Services;
 
@@ -88,8 +90,22 @@ public class AuthenticationController : ControllerBase
     [Route("/api/test")]
     [HttpGet]
     [Authorize, RolePermissionFilter]
-    public IActionResult Test()
+    public async Task<IActionResult> Test()
     {
-        return Ok();
+        var userName = User.GetUserName();
+        if (userName == null)
+        {
+            return BadRequest();
+        }
+
+        var jti = User.GetUserJti();
+        if (jti == null)
+        {
+            return BadRequest();
+        }
+
+        var valid = await _accountService.ValidUserJtiAsync(userName, jti);
+
+        return Ok(new { valid });
     }
 }

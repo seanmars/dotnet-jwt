@@ -15,8 +15,7 @@ public class SignInManager
 
     public SignInManager(ILogger<SignInManager> logger,
         JwtHelper jwtHelper,
-        AccountService accountService
-    )
+        AccountService accountService)
     {
         _logger = logger;
         _jwtHelper = jwtHelper;
@@ -34,6 +33,7 @@ public class SignInManager
         var claims = new List<Claim>
         {
             new(ClaimTypes.Role, ConstantData.DefaultRole.Member),
+            new(ClaimTypes.NameIdentifier, userName),
         };
 
         var permissionClaims = await _accountService.GetClaimsOnlyRoleAsync(
@@ -41,7 +41,8 @@ public class SignInManager
 
         claims.AddRange(permissionClaims);
 
-        var token = _jwtHelper.GenerateToken(userName, claims);
+        var jti = await _accountService.GenerateUserJti(user);
+        var token = _jwtHelper.GenerateToken(userName, jti, claims);
 
         return (result, token);
     }

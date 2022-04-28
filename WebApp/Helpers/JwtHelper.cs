@@ -23,7 +23,7 @@ public class JwtHelper
         return Encoding.UTF8.GetBytes(secretKey);
     }
 
-    public string GenerateToken(string userName, IList<Claim>? claims = null, int expireHours = 720)
+    public string GenerateToken(string userName, string jti, IList<Claim>? claims = null, int expireHours = 720)
     {
         var jwtIssuer = _jwtOption.Issuer;
         var jwtSecret = _jwtOption.Secret;
@@ -32,7 +32,7 @@ public class JwtHelper
         {
             new Claim(JwtRegisteredClaimNames.Iss, jwtIssuer),
             new Claim(JwtRegisteredClaimNames.Sub, userName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Jti, jti)
         });
 
         if (claims != null)

@@ -12,8 +12,12 @@ using WebApp.Helpers;
 using WebApp.Models;
 using WebApp.Services;
 
-void SettingService(IConfiguration configuration, IServiceCollection services)
+void SettingService(IWebHostEnvironment environment, IConfiguration configuration, IServiceCollection services)
 {
+    if (environment == null) throw new ArgumentNullException(nameof(environment));
+    if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+    if (services == null) throw new ArgumentNullException(nameof(services));
+
     services.AddCors();
     services.AddControllers();
 
@@ -24,8 +28,16 @@ void SettingService(IConfiguration configuration, IServiceCollection services)
     services.Configure<JwtOption>(configuration.GetSection("Jwt"));
 
     services.AddDbContext<ApplicationDbContext>(options =>
+    {
+        if (environment.IsDevelopment())
+        {
+            options.EnableDetailedErrors();
+            options.EnableSensitiveDataLogging();
+        }
+
         options.UseSqlite(
-            configuration.GetConnectionString("DefaultConnection")));
+            configuration.GetConnectionString("DefaultConnection"));
+    });
 
 
     services.AddBaseIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -52,14 +64,6 @@ void SettingService(IConfiguration configuration, IServiceCollection services)
                 IssuerSigningKey = new SymmetricSecurityKey(JwtHelper.GetKeyBytes(configuration[JwtOption.SecretKeyName]))
             };
         });
-
-    // services.AddAuthorization(options =>
-    // {
-    //     // Setting the default authorization policy for JwtBearer
-    //     options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-    //         .RequireAuthenticatedUser()
-    //         .Build();
-    // });
 
     services.AddTransient<IAuthorizationHandler, RolePermissionAuthorizationHandler>();
     services.AddSingleton<JwtHelper>();
@@ -96,10 +100,12 @@ void ConfigureApplication(WebApplication app)
 WebApplication CreateApplication()
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    var environment = builder.Environment;
     var configuration = builder.Configuration;
     var services = builder.Services;
 
-    SettingService(configuration, services);
+    SettingService(environment, configuration, services);
 
     var app = builder.Build();
     ConfigureApplication(app);

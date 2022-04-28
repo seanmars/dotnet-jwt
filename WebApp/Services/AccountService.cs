@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using WebApp.Constants;
 using WebApp.Data;
 using WebApp.Models;
@@ -54,10 +55,11 @@ public class AccountService
     {
         userName = _userManager.NormalizeName(userName);
         return _userManager.Users
+            .Where(u => u.NormalizedUserName == userName)
+            .Include(u => u.Claims)
             .Include(u => u.UserRoles!)
             .ThenInclude(ur => ur.Role)
-            .Where(u => u.NormalizedUserName == userName)
-            .FirstOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
     }
 
     public async Task<(IdentityResult, ApplicationUser?)> ValidUserAsync(string userName, string password,
@@ -260,5 +262,42 @@ public class AccountService
         params string[] filters)
     {
         return GetClaimsAsync(userName, false, true, cancellationToken, filters);
+    }
+
+    public async Task<string> GenerateUserJti(ApplicationUser? user)
+    {
+        if (user == null)
+        {
+            return string.Empty;
+        }
+
+        var claims = user.Claims?
+            .Where(uc => uc.ClaimType == JwtRegisteredClaimNames.Jti)
+            .Select(uc => uc.ToClaim())
+            .ToList();
+
+        if (claims is { Count: > 0 })
+        {
+            _ = await _userManager.RemoveClaimsAsync(user, claims);
+        }
+
+        var jti = Guid.NewGuid().ToString();
+        var result = await _userManager.AddClaimAsync(user, new Claim(JwtRegisteredClaimNames.Jti, jti));
+
+        return result.Succeeded ? jti : string.Empty;
+    }
+
+    public async Task<bool> ValidUserJtiAsync(string userName, string jti, CancellationToken cancellationToken = default)
+    {
+        var user = await GetUserByName(userName, cancellationToken);
+        if (user?.Claims == null)
+        {
+            return false;
+        }
+
+        var validJti = user.Claims
+            .Any(uc => uc.ClaimType == JwtRegisteredClaimNames.Jti && uc.ClaimValue == jti);
+
+        return validJti;
     }
 }
