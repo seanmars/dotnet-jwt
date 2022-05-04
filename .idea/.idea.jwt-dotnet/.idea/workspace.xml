@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fd582b7b-a7fc-426e-9696-a8cf6d5096e5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/misc.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.jwt-dotnet/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Controllers/AuthenticationController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Controllers/AuthenticationController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Helpers/JwtHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Helpers/JwtHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Services/AccountService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Services/AccountService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WebApp/Services/SignInManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/WebApp/Services/SignInManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WebApp/.gitignore" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +56,7 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -92,6 +89,8 @@
       <workItem from="1651024955067" duration="18089000" />
       <workItem from="1651057881283" duration="74000" />
       <workItem from="1651111843507" duration="16416000" />
+      <workItem from="1651631469948" duration="262000" />
+      <workItem from="1651631876176" duration="407000" />
     </task>
     <servers />
   </component>
