@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using WebApp.Authorizations;
 using WebApp.Configuration;
 using WebApp.Data;
@@ -12,7 +13,29 @@ using WebApp.Helpers;
 using WebApp.Models;
 using WebApp.Services;
 
-void SettingService(IWebHostEnvironment environment, IConfiguration configuration, IServiceCollection services)
+IConfiguration BuildLoggerConfiguration(string[] args)
+{
+    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+    var configurationBuilder = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"serilog.{environment}.json", optional: true, reloadOnChange: true);
+
+    configurationBuilder.AddCommandLine(args);
+    configurationBuilder.AddEnvironmentVariables();
+
+    return configurationBuilder.Build();
+}
+
+void ConfigureConfiguration(IWebHostEnvironment environment, IConfigurationBuilder configuration)
+{
+    configuration
+        .AddJsonFile("serilog.json", optional: true, reloadOnChange: true)
+        .AddJsonFile($"serilog.{environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+}
+
+void ConfigureServices(IWebHostEnvironment environment, IConfiguration configuration, IServiceCollection services)
 {
     if (environment == null) throw new ArgumentNullException(nameof(environment));
     if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -105,13 +128,38 @@ WebApplication CreateApplication()
     var configuration = builder.Configuration;
     var services = builder.Services;
 
-    SettingService(environment, configuration, services);
+    ConfigureConfiguration(environment, configuration);
+    ConfigureServices(environment, configuration, services);
+
+    builder.Host.UseSerilog((ctx, sp, loggerConfig) =>
+    {
+        loggerConfig
+            .ReadFrom.Configuration(ctx.Configuration)
+            .ReadFrom.Services(sp)
+            .Enrich.FromLogContext();
+    });
 
     var app = builder.Build();
+
     ConfigureApplication(app);
 
     return app;
 }
 
-var app = CreateApplication();
-app.Run();
+var loggerConfiguration = BuildLoggerConfiguration(args);
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(loggerConfiguration)
+    .CreateLogger();
+try
+{
+    var app = CreateApplication();
+    await app.RunAsync();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

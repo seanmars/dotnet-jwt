@@ -1,0 +1,6 @@
+### Custom ###
+*.db
+*.db-shm
+*.db-wal
+appsettings.*.json
+serilog.*.json
